@@ -1,4 +1,6 @@
 const User = require("../Model/UserModel");
+const mongoose = require("mongoose");
+
 
 const getAllUsers = async (req, res, next) => {
     let users;
@@ -29,5 +31,49 @@ const addUsers = async (req, res, next) => {
     }
 };
 
+const getById = async (req, res, next) => {
+    const id = req.params.id;
+
+    // Validate if the provided ID is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    let user;
+    try {
+        user = await User.findById(id);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "An error occurred while retrieving the user." });
+    }
+
+    // Not available user
+    if (!user) {
+        return res.status(404).json({ message: "User Not Found" });
+    }
+    return res.status(200).json({ user });
+};
+
+const updateUser = async (req,res,next) => {
+    const id = req.params.id;
+    const { name, gmail, age, address } = req.body;
+
+    let users;
+    try{
+        users = await User.findByIdAndUpdate(id,
+            {name:name,gmail:gmail,age:age});
+            users = await users.save();
+    }catch(err){
+        console.log(err);
+    }
+    if (!users) {
+        return res.status(404).json({ message: "User Not Found" });
+    }
+    return res.status(200).json({ users });
+    
+};
+
 exports.getAllUsers = getAllUsers;
 exports.addUsers = addUsers;
+exports.getById = getById;
+exports.updateUser =updateUser;
