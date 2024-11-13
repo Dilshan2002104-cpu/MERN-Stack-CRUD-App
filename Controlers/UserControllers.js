@@ -73,6 +73,22 @@ const updateUser = async (req,res,next) => {
     
 };
 
+const deleteUser = async(req,res,next) => {
+    const id = req.params.id;
+
+    let user;
+
+    try{
+        user = await User.findByIdAndDelete(id);
+    }catch(err){
+        console.log(err);
+    }
+    if (!user) {
+        return res.status(404).json({ message: "User Not Found" });
+    }
+    return res.status(200).json({ user });
+}
+
 exports.getAllUsers = getAllUsers;
 exports.addUsers = addUsers;
 exports.getById = getById;
